@@ -9,7 +9,7 @@ import electron from "vite-electron-plugin"
 import { loadViteEnv } from "vite-electron-plugin/plugin"
 import { rmSync } from "fs"
 import pkg from "./package.json"
-
+import AutoImport from "unplugin-auto-import/vite"
 /** 清空 dist */
 rmSync("dist", { recursive: true, force: true })
 
@@ -83,6 +83,28 @@ export default ({ mode }: ConfigEnv): UserConfigExport => {
       }),
       /** UnoCSS */
       UnoCSS(),
+      AutoImport({
+        // targets to transform
+        include: [
+          /\.[tj]sx?$/, // .ts, .tsx, .js, .jsx
+          /\.vue$/,
+          /\.vue\?vue/, // .vue
+          /\.md$/ // .md
+        ],
+
+        // global imports to register
+        imports: [
+          // presets
+          "vue",
+          "vue-router",
+          // example type import
+          {
+            from: "vue-router",
+            imports: ["RouteLocationRaw"],
+            type: true
+          }
+        ]
+      }),
       electron({
         outDir: "dist",
         include: ["script"],
