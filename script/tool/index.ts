@@ -31,7 +31,7 @@ export const iconvDecode = (text: string | Buffer, dataDecode?: string) => {
 
 /** 运行 CMD 命令 */
 export const runCmdOrder = (command: string, options?: ExecOptions, dataEncode?: string, dataDecode?: string) => {
-  return new Promise<CmdResult>((resolve) => {
+  return new Promise((resolve) => {
     const opt: {
       encoding: string
     } & ExecOptions = {
@@ -43,7 +43,7 @@ export const runCmdOrder = (command: string, options?: ExecOptions, dataEncode?:
     LocalLogger.Cmd.log("[命令]", command)
     LocalLogger.Cmd.log("[配置]", opt)
     exec(command, opt, (error, stdout, stderr) => {
-      const result: CmdResult = {
+      const result = {
         tid: Date.now().toString(),
         success: false,
         command,

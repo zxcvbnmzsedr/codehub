@@ -109,7 +109,7 @@ export default class WinMain {
   /** 监听通信事件 */
   static ipcListening() {
     // 设置窗口默认尺寸
-    ipcMain.on(IpcDict.CODE_01001, (_, dto: WinStateDTO) => {
+    ipcMain.on(IpcDict.CODE_01001, (_, dto) => {
       if (!this.winInst) return
       const size = AppConfig.adaptByScreen(dto, this.winInst)
       this.winInst.setResizable(true)

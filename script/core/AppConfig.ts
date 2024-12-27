@@ -108,7 +108,7 @@ export class AppConfig {
   }
 
   /** 根据分辨率适配窗口大小 */
-  static adaptByScreen(dto: WinStateDTO, win: BrowserWindow | null) {
+  static adaptByScreen(dto, win: BrowserWindow | null) {
     const devSize = { width: 1920, height: 1080 }
     // const devSize = { width: 3440, height: 1440 }
     const areaSize = screen.getPrimaryDisplay().workAreaSize
