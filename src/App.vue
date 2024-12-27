@@ -1,8 +1,9 @@
+<script lang="ts" setup>
+import zhCn from "element-plus/es/locale/lang/zh-cn" // Element Plus 中文包
+</script>
+
 <template>
-    <h1>💖 Hello World!</h1>
-    <p>Welcome to your对对对 Electron application.</p>
-  </template>
-  
-  <script setup>
-  console.log('👋 This message is being logged by "App.vue", included via Vite');
-  </script>
+  <el-config-provider :locale="zhCn">
+    <router-view />
+  </el-config-provider>
+</template>
