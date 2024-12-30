@@ -6,6 +6,8 @@ export interface ServerForm {
   authType: "password" | "key" | "cert" | "ask"
   username: string
   password: string
+  privateKey?: string
+  passphrase?: string
   remark: string
 }
 
@@ -59,6 +61,8 @@ export interface ElectronAPI {
 
   // Server
   testServerConnection: (server: ServerForm) => Promise<{ success: boolean; message: string }>
+  loadDefaultSSHKey: () => Promise<string>
+  loadSSHKeyFromFile: () => Promise<string>
 }
 
 declare global {

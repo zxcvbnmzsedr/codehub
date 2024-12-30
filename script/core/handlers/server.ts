@@ -23,15 +23,17 @@ export async function testServerConnection(
         config.password = server.password
         break
       case "key":
-        // TODO: 处理密钥认证
-        throw new Error("密钥认证方式暂未实现")
+        if (!server.privateKey) {
+          throw new Error("请提供私钥")
+        }
+        config.privateKey = server.privateKey
+        if (server.passphrase) {
+          config.passphrase = server.passphrase
+        }
+        break
       case "cert":
         // TODO: 处理证书认证
         throw new Error("证书认证方式暂未实现")
-      case "ask":
-        throw new Error("每次询问认证方式暂未实现")
-      default:
-        throw new Error("不支持的认证方式")
     }
 
     // 尝试连接

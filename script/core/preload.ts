@@ -57,6 +57,10 @@ contextBridge.exposeInMainWorld("electronAPI", {
     shell.openExternal(url)
   },
 
+  // Load SSH Keys
+  loadDefaultSSHKey: () => ipcRenderer.invoke("loadDefaultSSHKey"),
+  loadSSHKeyFromFile: () => ipcRenderer.invoke("loadSSHKeyFromFile"),
+
   // Categories
   loadCategories: () => {
     const categoriesPath = getFilePath(CATEGORY_FILE)

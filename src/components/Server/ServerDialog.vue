@@ -14,16 +14,28 @@
         <el-radio-group v-model="form.authType">
           <el-radio-button label="password">密码</el-radio-button>
           <el-radio-button label="key">秘钥</el-radio-button>
-          <el-radio-button label="cert">登录凭证</el-radio-button>
-          <el-radio-button label="ask">每次询问</el-radio-button>
         </el-radio-group>
       </el-form-item>
       <el-form-item label="登录用户" prop="username">
         <el-input v-model="form.username" placeholder="请输入登录用户" />
       </el-form-item>
-      <el-form-item label="登录密码" prop="password">
-        <el-input v-model="form.password" type="password" placeholder="请输入登录密码" show-password />
-      </el-form-item>
+      <template v-if="form.authType === 'password'">
+        <el-form-item label="登录密码" prop="password">
+          <el-input v-model="form.password" type="password" placeholder="请输入登录密码" show-password />
+        </el-form-item>
+      </template>
+      <template v-else-if="form.authType === 'key'">
+        <el-form-item label="登录秘钥" prop="privateKey">
+          <el-input v-model="form.privateKey" type="textarea" :rows="3" placeholder="请输入私钥" />
+          <div class="mt-2 flex gap-2">
+            <el-button size="small" @click="handleLoadDefaultKey">加载本地秘钥</el-button>
+            <el-button size="small" @click="handleLoadCustomKey">点击/拖拽文件上传秘钥</el-button>
+          </div>
+        </el-form-item>
+        <el-form-item label="秘钥密码" prop="passphrase">
+          <el-input v-model="form.passphrase" type="password" placeholder="请输入秘钥密码" show-password />
+        </el-form-item>
+      </template>
       <el-form-item label="主机备注" prop="remark">
         <el-input v-model="form.remark" type="textarea" :rows="3" placeholder="请输入主机备注" />
       </el-form-item>
@@ -53,6 +65,8 @@ interface ServerForm {
   authType: "password" | "key" | "cert" | "ask"
   username: string
   password: string
+  privateKey?: string
+  passphrase?: string
   remark: string
 }
 
@@ -81,6 +95,8 @@ const form = ref<ServerForm>({
   authType: props.initialData.authType || "password",
   username: props.initialData.username || "root",
   password: props.initialData.password || "",
+  privateKey: props.initialData.privateKey || "",
+  passphrase: props.initialData.passphrase || "",
   remark: props.initialData.remark || ""
 })
 
@@ -96,6 +112,8 @@ watch(
       authType: newData?.authType || "password",
       username: newData?.username || "root",
       password: newData?.password || "",
+      privateKey: newData?.privateKey || "",
+      passphrase: newData?.passphrase || "",
       remark: newData?.remark || ""
     }
   },
@@ -108,7 +126,34 @@ const rules: FormRules = {
   host: [{ required: true, message: "请输入地址", trigger: "blur" }],
   port: [{ required: true, message: "请输入端口", trigger: "blur" }],
   username: [{ required: true, message: "请输入登录用户", trigger: "blur" }],
-  password: [{ required: true, message: "请输入登录密码", trigger: "blur" }]
+  password: [
+    {
+      required: true,
+      message: "请输入登录密码",
+      trigger: "blur",
+      validator: (_, value, callback) => {
+        if (form.value.authType === "password" && !value) {
+          callback(new Error("请输入登录密码"))
+        } else {
+          callback()
+        }
+      }
+    }
+  ],
+  privateKey: [
+    {
+      required: true,
+      message: "请输入私钥",
+      trigger: "blur",
+      validator: (_, value, callback) => {
+        if (form.value.authType === "key" && !value) {
+          callback(new Error("请输入私钥"))
+        } else {
+          callback()
+        }
+      }
+    }
+  ]
 }
 
 const handleTest = async () => {
@@ -152,6 +197,28 @@ const handleSubmit = async () => {
       dialogVisible.value = false
     }
   })
+}
+
+const handleLoadDefaultKey = async () => {
+  try {
+    const keyContent = await window.electronAPI.loadDefaultSSHKey()
+    form.value.privateKey = keyContent
+    ElMessage.success("成功加载本地SSH密钥")
+  } catch (error) {
+    ElMessage.error(error instanceof Error ? error.message : "加载SSH密钥失败")
+  }
+}
+
+const handleLoadCustomKey = async () => {
+  try {
+    const keyContent = await window.electronAPI.loadSSHKeyFromFile()
+    if (keyContent) {
+      form.value.privateKey = keyContent
+      ElMessage.success("成功加载SSH密钥文件")
+    }
+  } catch (error) {
+    ElMessage.error(error instanceof Error ? error.message : "加载SSH密钥失败")
+  }
 }
 
 const open = () => {
