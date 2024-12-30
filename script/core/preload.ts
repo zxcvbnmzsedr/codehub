@@ -73,9 +73,10 @@ contextBridge.exposeInMainWorld("electronAPI", {
   },
   createServer: (server: any) => {
     const serversPath = checkCategoryFolder(server.categoryId)
-    const servers = readJsonFile(join(serversPath, SERVER_FILE))
+    const dataPath = join(serversPath, SERVER_FILE)
+    const servers = readJsonFile(dataPath)
     servers.push(server)
-    return writeJsonFile(join(serversPath, SERVER_FILE), servers)
+    return writeJsonFile(dataPath, servers)
   },
   updateServer: (server: any) => {
     const serversPath = checkCategoryFolder(server.categoryId)

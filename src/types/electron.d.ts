@@ -1,13 +1,12 @@
-export interface Server {
+export interface ServerForm {
   id: string
   name: string
   host: string
   port: string
-  categoryId: string
-  username?: string
-  password?: string
-  authType?: "password" | "key" | "cert" | "ask"
-  remark?: string
+  authType: "password" | "key" | "cert" | "ask"
+  username: string
+  password: string
+  remark: string
 }
 
 export interface Database {
@@ -37,7 +36,7 @@ export interface ElectronAPI {
   saveCategories: (categories: any) => boolean
 
   // Servers
-  loadServers: (categoryId: string) => Server[]
+  loadServers: (categoryId: string) => ServerForm[]
   createServer: (server: Server) => void
   updateServer: (server: Server) => void
   deleteServer: (id: string, categoryId: string) => void
