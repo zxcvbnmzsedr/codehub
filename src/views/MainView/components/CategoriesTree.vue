@@ -1,22 +1,32 @@
 <template>
-  <div class="w-400px">
-    <div class="mb-2">
+  <div class="w-150px">
+    <div class="mb-2 pl-5px pt-5px">
       <el-button type="primary" size="small" @click="showCreateDirDialog">
-        <el-icon>
-          <Plus />
-        </el-icon>
+        <el-icon><Plus /></el-icon>
         新建目录
       </el-button>
     </div>
 
-    <el-tree :data="directories" node-key="id" :expand-on-click-node="false" ref="treeRef" :empty-text="'暂无目录'">
+    <el-tree
+      :data="directories"
+      node-key="id"
+      :expand-on-click-node="false"
+      ref="treeRef"
+      :empty-text="'暂无目录'"
+      highlight-current
+      @node-click="handleNodeClick"
+    >
       <template #default="{ data }">
         <div class="flex items-center justify-between w-full pr-2">
           <span>{{ data.name }}</span>
-          <el-button type="primary" size="small" link @click="showCreateDirDialog(undefined, data)"
-            >新建子目录
-          </el-button>
-          <el-button type="danger" size="small" link @click="handleDeleteDir(data)">删除</el-button>
+          <div class="flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
+            <!-- <el-icon class="cursor-pointer text-primary mx-1" @click.stop="showCreateDirDialog(undefined, data)">
+              <Plus />
+            </el-icon> -->
+            <el-icon class="cursor-pointer text-danger mx-1" @click.stop="handleDeleteDir(data)">
+              <Delete />
+            </el-icon>
+          </div>
         </div>
       </template>
     </el-tree>
@@ -41,8 +51,12 @@
 import type { Ccategories } from "@/types/server"
 import { onMounted, ref } from "vue"
 import { ElMessageBox } from "element-plus"
-import { Plus } from "@element-plus/icons-vue"
+import { Plus, Delete } from "@element-plus/icons-vue"
 import { v4 as uuidv4 } from "uuid"
+
+const emit = defineEmits<{
+  (e: "select", category: Ccategories): void
+}>()
 
 const directories = ref<Ccategories[]>([])
 const treeRef = ref()
@@ -53,6 +67,10 @@ const currentNode = ref<Ccategories | null>(null)
 onMounted(() => {
   directories.value = window.electronAPI.loadCategories()
 })
+
+const handleNodeClick = (data: Ccategories) => {
+  emit("select", data)
+}
 
 const showCreateDirDialog = (event?: MouseEvent, node?: Ccategories): void => {
   currentNode.value = node || null
@@ -116,3 +134,26 @@ const handleDeleteDir = async (node: Ccategories) => {
   }
 }
 </script>
+
+<style scoped>
+.el-tree-node:hover .opacity-0 {
+  opacity: 1;
+}
+
+.text-primary {
+  color: var(--el-color-primary);
+}
+
+.text-danger {
+  color: var(--el-color-danger);
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.mx-1 {
+  margin-left: 0.25rem;
+  margin-right: 0.25rem;
+}
+</style>
