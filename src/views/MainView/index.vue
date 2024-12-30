@@ -7,14 +7,17 @@
 
     <!-- 右侧内容区 -->
     <div class="flex-1 p-4 space-y-4 overflow-auto">
-      <!-- 账号密码列表 -->
-      <credential-list v-if="selectedCategoryId" :category-id="selectedCategoryId" />
-
-      <!-- 服务器列表 -->
-      <server-list v-if="selectedCategoryId" :category-id="selectedCategoryId" />
-
-      <!-- 数据库列表 -->
-      <database-list v-if="selectedCategoryId" :category-id="selectedCategoryId" />
+      <el-tabs v-model="activeTab" type="card">
+        <el-tab-pane label="账号密码">
+          <credential-list v-if="selectedCategoryId" :category-id="selectedCategoryId" />
+        </el-tab-pane>
+        <el-tab-pane label="服务器">
+          <server-list v-if="selectedCategoryId" :category-id="selectedCategoryId" />
+        </el-tab-pane>
+        <el-tab-pane label="数据库">
+          <database-list v-if="selectedCategoryId" :category-id="selectedCategoryId" />
+        </el-tab-pane>
+      </el-tabs>
     </div>
   </div>
 </template>
@@ -26,7 +29,7 @@ import ServerList from "./components/ServerList.vue"
 import DatabaseList from "./components/DatabaseList.vue"
 import CredentialList from "./components/CredentialList.vue"
 import type { Ccategories } from "@/types/server"
-
+const activeTab = ref<string>("")
 const selectedCategoryId = ref<string>("")
 
 const handleCategorySelect = (category: Ccategories) => {

@@ -30,7 +30,7 @@ export default class WinMain {
     hasShadow: false, // 窗口是否有阴影. 默认值为 true
     resizable: true, // 是否允许拉伸大小
     fullscreenable: true, // 是否允许全屏
-    autoHideMenuBar: true, // 自动隐藏菜单栏, 除非按了 Alt 键, 默认值为 false
+    autoHideMenuBar: false, // 自动隐藏菜单栏, 除非按了 Alt 键, 默认值为 false
     backgroundColor: "transparent", // 背景颜色
     webPreferences: {
       devTools: true, // 是否开启 DevTools, 如果设置为 false（默认值为 true）, 则无法使用 BrowserWindow.webContents.openDevTools()
@@ -68,7 +68,6 @@ export default class WinMain {
     if (this.winInst) return
 
     this.winInst = new BrowserWindow(this.winOption)
-    this.winInst.removeMenu()
     if (AppConfig.IS_DEV_MODE) {
       this.winInst.loadURL(AppConfig.getWinUrl())
     } else {

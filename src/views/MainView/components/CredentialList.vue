@@ -195,11 +195,11 @@ const handleSubmit = async () => {
         ...form.value,
         id: isEdit.value ? currentId.value : Date.now().toString()
       }
-
+      const updateCredentialData = JSON.parse(JSON.stringify(credentialData))
       if (isEdit.value) {
-        window.electronAPI.updateCredential(credentialData)
+        window.electronAPI.updateCredential(updateCredentialData)
       } else {
-        window.electronAPI.createCredential(credentialData)
+        window.electronAPI.createCredential(updateCredentialData)
       }
 
       dialogVisible.value = false
