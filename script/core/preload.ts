@@ -8,6 +8,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
       const userDataPath = ipcRenderer.sendSync("get-user-data-path")
       const categoriesPath = join(userDataPath, "category.json")
       // 检查文件是否存在
+      console.log("categoriesPath", categoriesPath)
       if (!existsSync(categoriesPath)) {
         return []
       }
@@ -22,6 +23,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
     try {
       const userDataPath = ipcRenderer.sendSync("get-user-data-path")
       const categoriesPath = join(userDataPath, "category.json")
+      console.log("保存categoriesPath", categoriesPath, categories)
       writeFileSync(categoriesPath, JSON.stringify(categories, null, 2))
       return true
     } catch (error) {

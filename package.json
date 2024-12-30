@@ -117,6 +117,7 @@
     "path-to-regexp": "8.2.0",
     "pinia": "2.2.6",
     "screenfull": "6.0.2",
+    "uuid": "11.0.3",
     "vue": "3.5.13",
     "vue-router": "4.4.5",
     "vxe-table": "4.6.23",
