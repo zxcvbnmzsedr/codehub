@@ -202,7 +202,7 @@ const handleDelete = async (cred: Credential) => {
       cancelButtonText: "取消",
       type: "warning"
     })
-    window.electronAPI.deleteCredential(cred.id)
+    window.electronAPI.deleteCredential(cred.id, props.categoryId)
     loadCredentials()
     ElMessage.success("删除成功")
   } catch {

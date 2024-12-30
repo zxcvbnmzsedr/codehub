@@ -2,7 +2,7 @@
   <div class="w-full">
     <div class="flex justify-between items-center mb-4">
       <h3 class="text-lg font-medium">服务器</h3>
-      <el-button type="primary" size="small" @click="showCreateDialog">
+      <el-button type="primary" size="small" @click="handleCreate">
         <el-icon><Plus /></el-icon>
         新建服务器
       </el-button>
@@ -25,25 +25,7 @@
       </el-table-column>
     </el-table>
 
-    <el-dialog v-model="dialogVisible" :title="isEdit ? '编辑服务器' : '新建服务器'" width="500px">
-      <el-form ref="formRef" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="名称" prop="name">
-          <el-input v-model="form.name" placeholder="请输入服务器名称" />
-        </el-form-item>
-        <el-form-item label="地址" prop="host">
-          <el-input v-model="form.host" placeholder="请输入服务器地址" />
-        </el-form-item>
-        <el-form-item label="端口" prop="port">
-          <el-input v-model="form.port" placeholder="请输入端口号" />
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <span class="dialog-footer">
-          <el-button @click="dialogVisible = false">取消</el-button>
-          <el-button type="primary" @click="handleSubmit">确定</el-button>
-        </span>
-      </template>
-    </el-dialog>
+    <ServerDialog ref="dialogRef" :is-edit="isEdit" :initial-data="currentServer" @submit="handleSubmit" />
   </div>
 </template>
 
@@ -51,38 +33,17 @@
 import { ref, onMounted } from "vue"
 import { ElMessage, ElMessageBox } from "element-plus"
 import { Plus } from "@element-plus/icons-vue"
-import type { FormInstance, FormRules } from "element-plus"
-
-interface Server {
-  id: string
-  name: string
-  host: string
-  port: string | number
-  categoryId: string
-}
+import ServerDialog from "./ServerDialog.vue"
+import type { Server } from "@/types/electron"
 
 const props = defineProps<{
   categoryId: string
 }>()
 
 const servers = ref<Server[]>([])
-const dialogVisible = ref(false)
 const isEdit = ref(false)
-const currentId = ref("")
-
-const form = ref({
-  name: "",
-  host: "",
-  port: ""
-})
-
-const rules: FormRules = {
-  name: [{ required: true, message: "请输入服务器名称", trigger: "blur" }],
-  host: [{ required: true, message: "请输入服务器地址", trigger: "blur" }],
-  port: [{ required: true, message: "请输入端口号", trigger: "blur" }]
-}
-
-const formRef = ref<FormInstance>()
+const currentServer = ref<Partial<Server>>({})
+const dialogRef = ref()
 
 watch(
   () => props.categoryId,
@@ -99,25 +60,18 @@ const loadServers = () => {
   servers.value = window.electronAPI.loadServers(props.categoryId)
 }
 
-const showCreateDialog = () => {
+const handleCreate = () => {
   isEdit.value = false
-  form.value = {
-    name: "",
-    host: "",
-    port: ""
+  currentServer.value = {
+    categoryId: props.categoryId
   }
-  dialogVisible.value = true
+  dialogRef.value?.open()
 }
 
 const handleEdit = (row: Server) => {
   isEdit.value = true
-  currentId.value = row.id
-  form.value = {
-    name: row.name,
-    host: row.host,
-    port: row.port.toString()
-  }
-  dialogVisible.value = true
+  currentServer.value = { ...row }
+  dialogRef.value?.open()
 }
 
 const handleDelete = async (row: Server) => {
@@ -127,7 +81,7 @@ const handleDelete = async (row: Server) => {
       cancelButtonText: "取消",
       type: "warning"
     })
-    window.electronAPI.deleteServer(row.id)
+    window.electronAPI.deleteServer(row.id, props.categoryId)
     loadServers()
     ElMessage.success("删除成功")
   } catch {
@@ -141,27 +95,19 @@ const handleConnect = (row: Server) => {
   ElMessage.info("连接功能开发中")
 }
 
-const handleSubmit = async () => {
-  if (!formRef.value) return
+const handleSubmit = (formData: Omit<Server, "id">) => {
+  const serverData = {
+    ...formData,
+    id: isEdit.value ? currentServer.value.id! : Date.now().toString()
+  }
 
-  await formRef.value.validate((valid) => {
-    if (valid) {
-      const serverData = {
-        ...form.value,
-        categoryId: props.categoryId,
-        id: isEdit.value ? currentId.value : Date.now().toString()
-      }
+  if (isEdit.value) {
+    window.electronAPI.updateServer(serverData)
+  } else {
+    window.electronAPI.createServer(serverData)
+  }
 
-      if (isEdit.value) {
-        window.electronAPI.updateServer(serverData)
-      } else {
-        window.electronAPI.createServer(serverData)
-      }
-
-      dialogVisible.value = false
-      loadServers()
-      ElMessage.success(isEdit.value ? "更新成功" : "创建成功")
-    }
-  })
+  loadServers()
+  ElMessage.success(isEdit.value ? "更新成功" : "创建成功")
 }
 </script>

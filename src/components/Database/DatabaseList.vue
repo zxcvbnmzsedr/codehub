@@ -110,7 +110,7 @@ const handleDelete = async (row: Database) => {
       cancelButtonText: "取消",
       type: "warning"
     })
-    window.electronAPI.deleteDatabase(row.id)
+    window.electronAPI.deleteDatabase(row.id, props.categoryId)
     loadDatabases()
     ElMessage.success("删除成功")
   } catch {

@@ -1,14 +1,23 @@
 import { contextBridge, ipcRenderer, shell, clipboard } from "electron"
 import { join } from "path"
-import { readFileSync, writeFileSync, existsSync } from "fs"
+import { readFileSync, writeFileSync, existsSync, mkdirSync } from "fs"
 
 // 通用的文件操作函数
 const getFilePath = (fileName: string) => {
   const userDataPath = ipcRenderer.sendSync("get-user-data-path")
   return join(userDataPath, fileName)
 }
+const checkCategoryFolder = (categoryId: string) => {
+  const categoryPath = getFilePath(join("config", categoryId))
+  console.log("categoryPath", categoryPath)
+  if (!existsSync(categoryPath)) {
+    mkdirSync(categoryPath, { recursive: true })
+  }
+  return categoryPath
+}
 
 const readJsonFile = (filePath: string) => {
+  console.log("filePath", filePath)
   try {
     if (!existsSync(filePath)) {
       return []
@@ -30,6 +39,10 @@ const writeJsonFile = (filePath: string, data: any) => {
     return false
   }
 }
+const CATEGORY_FILE = "categories.json"
+const SERVER_FILE = "servers.json"
+const DATABASE_FILE = "databases.json"
+const CREDENTIAL_FILE = "credentials.json"
 
 // 确保用户数据目录存在
 contextBridge.exposeInMainWorld("electronAPI", {
@@ -45,98 +58,95 @@ contextBridge.exposeInMainWorld("electronAPI", {
 
   // Categories
   loadCategories: () => {
-    const categoriesPath = getFilePath("categories.json")
+    const categoriesPath = getFilePath(CATEGORY_FILE)
     return readJsonFile(categoriesPath)
   },
   saveCategories: (categories: any) => {
-    const categoriesPath = getFilePath("categories.json")
+    const categoriesPath = getFilePath(CATEGORY_FILE)
     return writeJsonFile(categoriesPath, categories)
   },
 
   // Servers
   loadServers: (categoryId: string) => {
-    const serversPath = getFilePath("servers.json")
-    const servers = readJsonFile(serversPath)
-    return servers.filter((server: any) => server.categoryId === categoryId)
+    const serversPath = checkCategoryFolder(categoryId)
+    return readJsonFile(join(serversPath, SERVER_FILE))
   },
   createServer: (server: any) => {
-    const serversPath = getFilePath("servers.json")
-    const servers = readJsonFile(serversPath)
+    const serversPath = checkCategoryFolder(server.categoryId)
+    const servers = readJsonFile(join(serversPath, SERVER_FILE))
     servers.push(server)
-    return writeJsonFile(serversPath, servers)
+    return writeJsonFile(join(serversPath, SERVER_FILE), servers)
   },
   updateServer: (server: any) => {
-    const serversPath = getFilePath("servers.json")
-    const servers = readJsonFile(serversPath)
+    const serversPath = checkCategoryFolder(server.categoryId)
+    const servers = readJsonFile(join(serversPath, SERVER_FILE))
     const index = servers.findIndex((s: any) => s.id === server.id)
     if (index !== -1) {
       servers[index] = server
-      return writeJsonFile(serversPath, servers)
+      return writeJsonFile(join(serversPath, SERVER_FILE), servers)
     }
     return false
   },
-  deleteServer: (id: string) => {
-    const serversPath = getFilePath("servers.json")
-    const servers = readJsonFile(serversPath)
+  deleteServer: (id: string, categoryId: string) => {
+    const serversPath = checkCategoryFolder(categoryId)
+    const servers = readJsonFile(join(serversPath, SERVER_FILE))
     const filteredServers = servers.filter((s: any) => s.id !== id)
-    return writeJsonFile(serversPath, filteredServers)
+    return writeJsonFile(join(serversPath, SERVER_FILE), filteredServers)
   },
 
   // Databases
   loadDatabases: (categoryId: string) => {
-    const databasesPath = getFilePath("databases.json")
-    const databases = readJsonFile(databasesPath)
-    return databases.filter((db: any) => db.categoryId === categoryId)
+    const databasesPath = checkCategoryFolder(categoryId)
+    return readJsonFile(join(databasesPath, DATABASE_FILE))
   },
   createDatabase: (database: any) => {
-    const databasesPath = getFilePath("databases.json")
-    const databases = readJsonFile(databasesPath)
+    const databasesPath = checkCategoryFolder(database.categoryId)
+    const databases = readJsonFile(join(databasesPath, DATABASE_FILE))
     databases.push(database)
-    return writeJsonFile(databasesPath, databases)
+    return writeJsonFile(join(databasesPath, DATABASE_FILE), databases)
   },
   updateDatabase: (database: any) => {
-    const databasesPath = getFilePath("databases.json")
-    const databases = readJsonFile(databasesPath)
+    const databasesPath = checkCategoryFolder(database.categoryId)
+    const databases = readJsonFile(join(databasesPath, DATABASE_FILE))
     const index = databases.findIndex((db: any) => db.id === database.id)
     if (index !== -1) {
       databases[index] = database
-      return writeJsonFile(databasesPath, databases)
+      return writeJsonFile(join(databasesPath, DATABASE_FILE), databases)
     }
     return false
   },
-  deleteDatabase: (id: string) => {
-    const databasesPath = getFilePath("databases.json")
-    const databases = readJsonFile(databasesPath)
+  deleteDatabase: (id: string, categoryId: string) => {
+    const databasesPath = checkCategoryFolder(categoryId)
+    const databases = readJsonFile(join(databasesPath, DATABASE_FILE))
     const filteredDatabases = databases.filter((db: any) => db.id !== id)
-    return writeJsonFile(databasesPath, filteredDatabases)
+    return writeJsonFile(join(databasesPath, DATABASE_FILE), filteredDatabases)
   },
 
   // Credentials
   loadCredentials: (categoryId: string) => {
-    const credentialsPath = getFilePath("credentials.json")
-    const credentials = readJsonFile(credentialsPath)
-    return credentials.filter((cred: any) => cred.categoryId === categoryId)
+    const credentialsPath = checkCategoryFolder(categoryId)
+    return readJsonFile(join(credentialsPath, CREDENTIAL_FILE))
   },
   createCredential: (credential: any) => {
-    const credentialsPath = getFilePath("credentials.json")
-    const credentials = readJsonFile(credentialsPath)
+    const credentialsPath = checkCategoryFolder(credential.categoryId)
+    const credentials = readJsonFile(join(credentialsPath, CREDENTIAL_FILE))
     credentials.push(credential)
-    return writeJsonFile(credentialsPath, credentials)
+    return writeJsonFile(join(credentialsPath, CREDENTIAL_FILE), credentials)
   },
   updateCredential: (credential: any) => {
-    const credentialsPath = getFilePath("credentials.json")
-    const credentials = readJsonFile(credentialsPath)
+    const credentialsPath = checkCategoryFolder(credential.categoryId)
+    const credentials = readJsonFile(join(credentialsPath, CREDENTIAL_FILE))
     const index = credentials.findIndex((c: any) => c.id === credential.id)
     if (index !== -1) {
       credentials[index] = credential
-      return writeJsonFile(credentialsPath, credentials)
+      return writeJsonFile(join(credentialsPath, CREDENTIAL_FILE), credentials)
     }
     return false
   },
-  deleteCredential: (id: string) => {
-    const credentialsPath = getFilePath("credentials.json")
-    const credentials = readJsonFile(credentialsPath)
+  deleteCredential: (id: string, categoryId: string) => {
+    const credentialsPath = checkCategoryFolder(categoryId)
+    const credentials = readJsonFile(join(credentialsPath, CREDENTIAL_FILE))
     const filteredCredentials = credentials.filter((c: any) => c.id !== id)
-    return writeJsonFile(credentialsPath, filteredCredentials)
+    return writeJsonFile(join(credentialsPath, CREDENTIAL_FILE), filteredCredentials)
   }
 })

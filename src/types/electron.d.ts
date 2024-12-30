@@ -2,8 +2,12 @@ export interface Server {
   id: string
   name: string
   host: string
-  port: string | number
+  port: string
   categoryId: string
+  username?: string
+  password?: string
+  authType?: "password" | "key" | "cert" | "ask"
+  remark?: string
 }
 
 export interface Database {
@@ -36,19 +40,19 @@ export interface ElectronAPI {
   loadServers: (categoryId: string) => Server[]
   createServer: (server: Server) => void
   updateServer: (server: Server) => void
-  deleteServer: (id: string) => void
+  deleteServer: (id: string, categoryId: string) => void
 
   // Databases
   loadDatabases: (categoryId: string) => Database[]
   createDatabase: (database: Database) => void
   updateDatabase: (database: Database) => void
-  deleteDatabase: (id: string) => void
+  deleteDatabase: (id: string, categoryId: string) => void
 
   // Credentials
   loadCredentials: (categoryId: string) => Credential[]
   createCredential: (credential: Credential) => void
   updateCredential: (credential: Credential) => void
-  deleteCredential: (id: string) => void
+  deleteCredential: (id: string, categoryId: string) => void
 
   // Utils
   openExternal: (url: string) => void
