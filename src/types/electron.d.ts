@@ -49,6 +49,10 @@ export interface ElectronAPI {
   createCredential: (credential: Credential) => void
   updateCredential: (credential: Credential) => void
   deleteCredential: (id: string) => void
+
+  // Utils
+  openExternal: (url: string) => void
+  copyToClipboard: (text: string) => void
 }
 
 declare global {

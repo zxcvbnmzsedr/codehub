@@ -13,7 +13,7 @@
         <div class="flex justify-between items-start">
           <div>
             <h4 class="font-medium text-base">{{ cred.title }}</h4>
-            <a :href="cred.url" target="_blank" class="text-blue-600 hover:text-blue-800 text-sm">{{ cred.url }}</a>
+            <a @click.prevent="openLink(cred.url)" class="text-blue-600 hover:text-blue-800 text-sm">{{ cred.url }}</a>
           </div>
           <div class="space-x-2">
             <el-button type="primary" size="small" link @click="handleEdit(cred)">编辑</el-button>
@@ -24,7 +24,12 @@
           <div v-for="(account, idx) in cred.accounts" :key="idx" class="bg-gray-50 p-3 rounded">
             <p class="font-medium">{{ account.role }}：</p>
             <div class="ml-4 space-y-2">
-              <p>账号：{{ account.username }}</p>
+              <p class="flex items-center">
+                账号：{{ account.username }}
+                <el-button type="primary" link size="small" @click="copyToClipboard(account.username)">
+                  复制
+                </el-button>
+              </p>
               <p class="flex items-center">
                 密码：
                 <span class="relative">
@@ -33,6 +38,9 @@
                 </span>
                 <el-button type="primary" link size="small" @click="togglePassword(cred.id, idx)">
                   {{ visiblePasswords[`${cred.id}-${idx}`] ? "隐藏" : "显示" }}
+                </el-button>
+                <el-button type="primary" link size="small" @click="copyToClipboard(account.password)">
+                  复制
                 </el-button>
               </p>
             </div>
@@ -96,6 +104,15 @@ import type { Credential } from "@/types/electron"
 const props = defineProps<{
   categoryId: string
 }>()
+
+const openLink = (url: string) => {
+  window.electronAPI.openExternal(url)
+}
+
+const copyToClipboard = (text: string) => {
+  window.electronAPI.copyToClipboard(text)
+  ElMessage.success("复制成功")
+}
 
 const credentials = ref<Credential[]>([])
 const dialogVisible = ref(false)

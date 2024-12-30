@@ -1,4 +1,4 @@
-import { contextBridge, ipcRenderer } from "electron"
+import { contextBridge, ipcRenderer, shell, clipboard } from "electron"
 import { join } from "path"
 import { readFileSync, writeFileSync, existsSync } from "fs"
 
@@ -33,6 +33,16 @@ const writeJsonFile = (filePath: string, data: any) => {
 
 // 确保用户数据目录存在
 contextBridge.exposeInMainWorld("electronAPI", {
+  // 复制到剪贴板
+  copyToClipboard: (text: string) => {
+    clipboard.writeText(text)
+  },
+
+  // 打开外部链接
+  openExternal: (url: string) => {
+    shell.openExternal(url)
+  },
+
   // Categories
   loadCategories: () => {
     const categoriesPath = getFilePath("categories.json")
