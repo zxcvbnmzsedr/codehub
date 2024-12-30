@@ -46,6 +46,7 @@ const CREDENTIAL_FILE = "credentials.json"
 
 // 确保用户数据目录存在
 contextBridge.exposeInMainWorld("electronAPI", {
+  testServerConnection: (server) => ipcRenderer.invoke("testServerConnection", server),
   // 复制到剪贴板
   copyToClipboard: (text: string) => {
     clipboard.writeText(text)

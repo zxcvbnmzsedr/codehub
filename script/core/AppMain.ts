@@ -10,6 +10,7 @@ import IpcDict from "../tool/ipc-dict"
 import AppMenu from "./AppMenu"
 import AppTray from "./AppTray"
 import WinMain from "./WinMain"
+import { registerIpcHandlers } from "./ipc"
 
 export default class AppMain {
   // 打印日志
@@ -43,6 +44,8 @@ export default class AppMain {
       // 主窗口
       WinMain.create()
       WinMain.ipcListening()
+      // 注册UOC
+      registerIpcHandlers()
     })
 
     /** 应用被激活 */

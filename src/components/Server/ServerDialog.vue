@@ -43,7 +43,7 @@
 <script setup lang="ts">
 import { ref, watch } from "vue"
 import type { FormInstance, FormRules } from "element-plus"
-import { ElMessage } from "element-plus"
+import { ElLoading, ElMessage } from "element-plus"
 
 interface ServerForm {
   categoryId: string
@@ -111,8 +111,36 @@ const rules: FormRules = {
   password: [{ required: true, message: "请输入登录密码", trigger: "blur" }]
 }
 
-const handleTest = () => {
-  ElMessage.info("测试连接功能开发中")
+const handleTest = async () => {
+  // 验证必填字段
+  if (
+    !form.value.host ||
+    !form.value.port ||
+    !form.value.username ||
+    (form.value.authType === "password" && !form.value.password)
+  ) {
+    ElMessage.warning("请填写必要的连接信息")
+    return
+  }
+  const loading = ElLoading.service({
+    lock: true,
+    text: "正在测试连接...",
+    background: "rgba(0, 0, 0, 0.7)"
+  })
+  try {
+    const server = JSON.parse(JSON.stringify(form.value))
+    const result = await window.electronAPI.testServerConnection(server)
+
+    if (result.success) {
+      ElMessage.success("连接成功")
+    } else {
+      ElMessage.error(`连接失败: ${result.message}`)
+    }
+  } catch (error) {
+    ElMessage.error(`连接失败: ${error instanceof Error ? error.message : "未知错误"}`)
+  } finally {
+    loading.close()
+  }
 }
 
 const handleSubmit = async () => {

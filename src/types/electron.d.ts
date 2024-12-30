@@ -56,6 +56,9 @@ export interface ElectronAPI {
   // Utils
   openExternal: (url: string) => void
   copyToClipboard: (text: string) => void
+
+  // Server
+  testServerConnection: (server: ServerForm) => Promise<{ success: boolean; message: string }>
 }
 
 declare global {
