@@ -3,12 +3,12 @@ export interface ServerForm {
   name: string
   host: string
   port: string
-  authType: "password" | "key" | "cert" | "ask"
   username: string
-  password: string
+  password?: string
+  authType?: "password" | "key" | "cert" | "ask"
   privateKey?: string
   passphrase?: string
-  remark: string
+  categoryId: string
 }
 
 export interface Database {
@@ -63,6 +63,12 @@ export interface ElectronAPI {
   testServerConnection: (server: ServerForm) => Promise<{ success: boolean; message: string }>
   loadDefaultSSHKey: () => Promise<string>
   loadSSHKeyFromFile: () => Promise<string>
+
+  // SSH
+  connectSSH: (serverInfo: ServerForm) => Promise<boolean>
+  writeSSH: (serverId: string, data: string) => void
+  onSSHData: (callback: (data: string) => void) => void
+  disconnectSSH: (serverId: string) => Promise<void>
 }
 
 declare global {

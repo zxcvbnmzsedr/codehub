@@ -26,7 +26,8 @@
     "lint:eslint": "eslint --cache --max-warnings 0 \"{script,src,types}/**/*.{vue,js,jsx,ts,tsx}\" --fix",
     "lint:prettier": "prettier --write \"{script,src,types}/**/*.{vue,js,jsx,ts,tsx,json,css,less,scss,html,md}\"",
     "lint": "pnpm lint:eslint && pnpm lint:prettier",
-    "prepare": "husky"
+    "prepare": "husky",
+    "postinstall": "rm -rf ./node_modules/node-pty/build/Release/pty.node && mkdir -p ./node_modules/node-pty/build/Release  && cp ./pty.node ./node_modules/node-pty/build/Release/pty.node"
   },
   "build": {
     "productName": "CodeHub",
@@ -111,6 +112,7 @@
     "iconv-lite": "0.6.3",
     "lodash-es": "4.17.21",
     "mitt": "3.0.1",
+    "node-pty": "1.0.0",
     "node-ssh": "13.2.0",
     "normalize.css": "8.0.1",
     "nprogress": "0.2.0",
@@ -123,7 +125,9 @@
     "vue-router": "4.4.5",
     "vxe-table": "4.6.23",
     "vxe-table-plugin-element": "4.0.4",
-    "xe-utils": "3.5.31"
+    "xe-utils": "3.5.31",
+    "xterm": "5.3.0",
+    "xterm-addon-fit": "0.8.0"
   },
   "devDependencies": {
     "@types/lodash-es": "4.17.12",

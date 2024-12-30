@@ -3,6 +3,7 @@ import { readFile } from "fs/promises"
 import { join } from "path"
 import { homedir } from "os"
 import { testServerConnection } from "./handlers/server"
+import { registerSSHHandlers } from "./handlers/ssh"
 
 export function registerIpcHandlers() {
   // Server handlers
@@ -38,4 +39,6 @@ export function registerIpcHandlers() {
       throw new Error("无法读取选择的密钥文件")
     }
   })
+
+  registerSSHHandlers(ipcMain)
 }

@@ -13,6 +13,23 @@ import WinMain from "./WinMain"
 import { registerIpcHandlers } from "./ipc"
 
 export default class AppMain {
+  constructor() {
+    this.init()
+  }
+
+  private init() {
+    app.whenReady().then(() => {
+      registerIpcHandlers()
+      // 其他初始化代码...
+    })
+
+    app.on("window-all-closed", () => {
+      if (process.platform !== "darwin") {
+        app.quit()
+      }
+    })
+  }
+
   // 打印日志
   private static printf(...params: any[]) {
     LocalLogger.Index.log(...params)
@@ -46,6 +63,7 @@ export default class AppMain {
       WinMain.ipcListening()
       // 注册UOC
       registerIpcHandlers()
+      WinMain.openDevtool("undocked")
     })
 
     /** 应用被激活 */

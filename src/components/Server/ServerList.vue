@@ -40,14 +40,7 @@ const props = defineProps<{
 
 const servers = ref<ServerForm[]>([])
 const isEdit = ref(false)
-const currentServer = ref<
-  Partial<
-    ServerForm & {
-      id?: string
-      categoryId?: string
-    }
-  >
->({})
+const currentServer = ref<Partial<ServerForm>>({})
 const dialogRef = ref()
 
 watch(
@@ -94,10 +87,12 @@ const handleDelete = async (row: ServerForm) => {
   }
 }
 
-const handleConnect = (row: ServerForm) => {
-  // TODO: Implement connection logic
-  console.log("Connecting to server:", row)
-  ElMessage.info("连接功能开发中")
+const handleConnect = async (row: ServerForm) => {
+  try {
+    await window.electronAPI.connectSSH(JSON.parse(JSON.stringify(row)))
+  } catch (error) {
+    ElMessage.error("连接失败：" + (error as Error).message)
+  }
 }
 
 const handleSubmit = (formData: Omit<ServerForm, "id">) => {

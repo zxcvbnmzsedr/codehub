@@ -1,6 +1,7 @@
 import { contextBridge, ipcRenderer, shell, clipboard } from "electron"
 import { join } from "path"
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from "fs"
+import type { ServerForm } from "../../src/types/electron"
 
 // 通用的文件操作函数
 const getFilePath = (fileName: string) => {
@@ -154,5 +155,12 @@ contextBridge.exposeInMainWorld("electronAPI", {
     const credentials = readJsonFile(join(credentialsPath, CREDENTIAL_FILE))
     const filteredCredentials = credentials.filter((c: any) => c.id !== id)
     return writeJsonFile(join(credentialsPath, CREDENTIAL_FILE), filteredCredentials)
-  }
+  },
+
+  connectSSH: (serverInfo: ServerForm) => ipcRenderer.invoke("connect-ssh", serverInfo),
+  writeSSH: (serverId: string, data: string) => ipcRenderer.send("write-ssh", serverId, data),
+  onSSHData: (callback: (data: string) => void) => {
+    ipcRenderer.on("ssh-data", (_event, data) => callback(data))
+  },
+  disconnectSSH: (serverId: string) => ipcRenderer.invoke("disconnect-ssh", serverId)
 })
