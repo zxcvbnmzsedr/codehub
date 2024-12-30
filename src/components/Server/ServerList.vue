@@ -84,6 +84,13 @@ const rules: FormRules = {
 
 const formRef = ref<FormInstance>()
 
+watch(
+  () => props.categoryId,
+  () => {
+    loadServers()
+  }
+)
+
 onMounted(() => {
   loadServers()
 })

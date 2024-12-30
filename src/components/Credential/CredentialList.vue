@@ -140,6 +140,13 @@ const rules: FormRules = {
 
 const formRef = ref<FormInstance>()
 
+watch(
+  () => props.categoryId,
+  () => {
+    loadCredentials()
+  }
+)
+
 onMounted(() => {
   loadCredentials()
 })
