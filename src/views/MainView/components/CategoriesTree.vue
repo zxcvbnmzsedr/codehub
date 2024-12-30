@@ -20,9 +20,9 @@
         <div class="flex items-center justify-between w-full pr-2">
           <span>{{ data.name }}</span>
           <div class="flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
-            <!-- <el-icon class="cursor-pointer text-primary mx-1" @click.stop="showCreateDirDialog(undefined, data)">
-              <Plus />
-            </el-icon> -->
+            <el-icon class="cursor-pointer text-primary mx-1" @click.stop="handleRenameDir(data)">
+              <Edit />
+            </el-icon>
             <el-icon class="cursor-pointer text-danger mx-1" @click.stop="handleDeleteDir(data)">
               <Delete />
             </el-icon>
@@ -51,7 +51,7 @@
 import type { Ccategories } from "@/types/server"
 import { onMounted, ref } from "vue"
 import { ElMessageBox } from "element-plus"
-import { Plus, Delete } from "@element-plus/icons-vue"
+import { Plus, Delete, Edit } from "@element-plus/icons-vue"
 import { v4 as uuidv4 } from "uuid"
 
 const emit = defineEmits<{
@@ -63,6 +63,7 @@ const treeRef = ref()
 const dialogVisible = ref(false)
 const newDirName = ref("")
 const currentNode = ref<Ccategories | null>(null)
+const isRenaming = ref(false)
 
 onMounted(() => {
   directories.value = window.electronAPI.loadCategories()
@@ -74,6 +75,14 @@ const handleNodeClick = (data: Ccategories) => {
 
 const showCreateDirDialog = (event?: MouseEvent, node?: Ccategories): void => {
   currentNode.value = node || null
+  isRenaming.value = false
+  dialogVisible.value = true
+}
+
+const handleRenameDir = (node: Ccategories): void => {
+  currentNode.value = node
+  newDirName.value = node.name
+  isRenaming.value = true
   dialogVisible.value = true
 }
 
@@ -83,17 +92,21 @@ const confirmCreateDir = () => {
     return
   }
 
-  const newDir: Ccategories = {
-    id: uuidv4(),
-    name: newDirName.value,
-    children: []
-  }
-
-  if (currentNode.value) {
-    currentNode.value.children = currentNode.value.children || []
-    currentNode.value.children.push(newDir)
+  if (isRenaming.value && currentNode.value) {
+    currentNode.value.name = newDirName.value
   } else {
-    directories.value.push(newDir)
+    const newDir: Ccategories = {
+      id: uuidv4(),
+      name: newDirName.value,
+      children: []
+    }
+
+    if (currentNode.value) {
+      currentNode.value.children = currentNode.value.children || []
+      currentNode.value.children.push(newDir)
+    } else {
+      directories.value.push(newDir)
+    }
   }
 
   // Create a clean data structure for saving
