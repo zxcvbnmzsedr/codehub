@@ -129,5 +129,8 @@ export default class AppMain {
     ipcMain.on(IpcDict.CODE_02001, (_, logName: string, ...params: any[]) => {
       new LogFactory(logName).log(...params)
     })
+    ipcMain.on("get-user-data-path", (event) => {
+      event.returnValue = app.getPath("userData")
+    })
   }
 }

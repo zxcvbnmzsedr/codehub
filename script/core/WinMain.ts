@@ -7,6 +7,7 @@ import { ipcMain, BrowserWindow, type BrowserWindowConstructorOptions } from "el
 import { LocalLogger } from "./AppLogger"
 import { AppConfig } from "./AppConfig"
 import IpcDict from "../tool/ipc-dict"
+import { join } from "path"
 
 export default class WinMain {
   // 打印日志
@@ -35,10 +36,11 @@ export default class WinMain {
       devTools: true, // 是否开启 DevTools, 如果设置为 false（默认值为 true）, 则无法使用 BrowserWindow.webContents.openDevTools()
       webSecurity: false, // 当设置为 false, 将禁用同源策略
       nodeIntegration: true, // 是否启用 Node 集成
-      contextIsolation: false, // 是否在独立 JavaScript 环境中运行 Electron API 和指定的 preload 脚本，默认为 true
+      contextIsolation: true, // 是否在独立 JavaScript 环境中运行 Electron API 和指定的 preload 脚本，默认为 true
       nodeIntegrationInWorker: true, // 是否在 Web 工作器中启用了 Node 集成
       backgroundThrottling: false, // 是否在页面成为背景时限制动画和计时器，默认值为 true
-      spellcheck: false // 是否启用内置拼写检查器
+      spellcheck: false, // 是否启用内置拼写检查器
+      preload: join(__dirname, "preload.js")
     }
   }
 

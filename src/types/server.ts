@@ -1,8 +1,9 @@
-export interface Directory {
+export interface Ccategories {
   id: string
   name: string
   type: "document" | "folder"
-  children?: Directory[]
+  parentId: string
+  children?: Ccategories[]
   expanded?: boolean
   path: string
 }
