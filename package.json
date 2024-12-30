@@ -26,8 +26,7 @@
     "lint:eslint": "eslint --cache --max-warnings 0 \"{script,src,types}/**/*.{vue,js,jsx,ts,tsx}\" --fix",
     "lint:prettier": "prettier --write \"{script,src,types}/**/*.{vue,js,jsx,ts,tsx,json,css,less,scss,html,md}\"",
     "lint": "pnpm lint:eslint && pnpm lint:prettier",
-    "prepare": "husky",
-    "postinstall": "rm -rf ./node_modules/node-pty/build/Release/pty.node && mkdir -p ./node_modules/node-pty/build/Release  && cp ./pty.node ./node_modules/node-pty/build/Release/pty.node"
+    "prepare": "husky"
   },
   "build": {
     "productName": "CodeHub",
